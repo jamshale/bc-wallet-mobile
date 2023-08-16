@@ -25,6 +25,7 @@ import SplashScreen from 'react-native-splash-screen'
 import Toast from 'react-native-toast-message'
 
 import bcwallet from './src'
+import PushNotifications from './src/components/PushNotifications'
 import { homeTourSteps } from './src/components/tours/HomeTourSteps'
 import { surveyMonkeyUrl, surveyMonkeyExitUrl } from './src/constants'
 import WebDisplay from './src/screens/WebDisplay'
@@ -129,6 +130,7 @@ const App = () => {
                   <RootStack />
                 </TourProvider>
                 <Toast topOffset={15} config={toastConfig} />
+                <PushNotifications />
               </NetworkProvider>
             </AuthProvider>
           </ConfigurationProvider>

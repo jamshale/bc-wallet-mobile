@@ -1,13 +1,14 @@
-import { Agent } from '@aries-framework/core'
+import { useAgent } from '@aries-framework/react-hooks'
 import messaging from '@react-native-firebase/messaging'
 import { useEffect } from 'react'
+import { Platform } from 'react-native'
 import { request, check, PERMISSIONS, RESULTS } from 'react-native-permissions'
 
-interface Props {
-  agent: Agent | undefined
-}
+import { setDeviceInfo } from '../helpers/PushNotificationsHelper'
 
-const PushNotifications = ({ agent }: Props) => {
+const PushNotifications = () => {
+  const { agent } = useAgent()
+
   const backgroundHandler = () => {
     return messaging().setBackgroundMessageHandler(async () => {
       // Do nothing with background messages. Defaults to login and home screen flow
@@ -38,6 +39,12 @@ const PushNotifications = ({ agent }: Props) => {
 
   const requestPermission = async () => {
     if (!agent) return
+
+    if (Platform.OS === 'ios') {
+      await messaging().requestPermission()
+      return
+    }
+
     const checkPermission = await checkNotificationPermission()
     if (checkPermission !== RESULTS.GRANTED) {
       const request = await requestNotificationPermission()
@@ -50,13 +57,13 @@ const PushNotifications = ({ agent }: Props) => {
 
   useEffect(() => {
     if (!agent) return
-    const backgroundListener = backgroundHandler()
+    setDeviceInfo({ agent })
+    backgroundHandler()
     const unsubscribe = messageHandler()
     requestPermission()
 
     return () => {
-      backgroundListener
-      unsubscribe
+      unsubscribe()
     }
   }, [agent]) // Reload if agent becomes defined
 
